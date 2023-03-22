@@ -1,33 +1,66 @@
+# constants
+const pi = 3.141592653589793
+const sqrpi2 = (pi^(-0.5)) * 2.0
+const dtol = 1.0e-10
+const rcut = 1.0e-12
+const tobohrs = 1.889725987722
 
-import SpecialFunctions # erf
-
-Base.@kwdef struct Parameters
-    pi::Float64 = 3.141592653589793
-    sqrpi2::Float64 = (pi^(-0.5)) * 2.0
-    dtol::Float64 = 1.0e-10
-    rcut::Float64 = 1.0e-12
-    tobohrs::Float64 = 1.889725987722
-end
-
-function get_input_file(args::Array{String, 1})::String
+# input file
+function get_input_filename_from_args(args = ARGS)
     if length(args) != 1
-        if MPI.Initialized()
+        if @isdefined MPI
             throw(ArgumentError("Usage: mpirun -n <nprocs> julia --project BasicHFProxy_<backend> <input_file>"))
         else
             throw(ArgumentError("Usage: julia --project BasicHFProxy_<backend> <input_file>"))
         end
     end
-    return first(args)
+    return only(args)
 end
 
 """
+Parses given input file and returns a `NamedTuple` with the following keys:
+* `ngauss`: number of gaussian-type functions (GTF) per atom
+* `natom`: number of atoms
+* `xpnt`: vector of expansion exponents
+* `coef`: vector of expansion coefficients
+* `geom`: geometry matrix
+"""
+function parse_input_file(filename)
+    # read + split entire file
+    data = split(read(filename, String))
+    # parse first two records as integers
+    ngauss = parse(Int, popfirst!(data))
+    natom = parse(Int, popfirst!(data))
+    @debug("Input data", ngauss, natom)
+
+    # parse next records as exponents and coefficients
+    xpnt = Vector{Float64}(undef, ngauss)
+    coef = Vector{Float64}(undef, ngauss)
+    for i in 1:ngauss
+        xpnt[i] = parse(Float64, popfirst!(data))
+        coef[i] = parse(Float64, popfirst!(data))
+    end
+    @debug("exponents", xpnt)
+    @debug("coefficients", coef)
+
+    # parse geometry matrix
+    geom = Matrix{Float64}(undef, 3, natom)
+    for i in 1:natom
+        for j in 1:3
+            geom[j, i] = parse(Float64, popfirst!(data))
+        end
+    end
+    return (; ngauss, natom, xpnt, coef, geom)
+end
+
+# computation
+"""
 Main kernel for the calculation of the two-electron integrals
 """
-function ssss(i::Int32, j::Int32, k::Int32, l::Int32, ngauss::Int32,
-              xpnt::Array{Float64, 1}, coef::Array{Float64, 1},
-              geom::Array{Float64, 2}, eri::Float64)
+function ssss(i::Integer, j::Integer, k::Integer, l::Integer, ngauss::Integer,
+              xpnt::AbstractVector{<:Float64}, coef::AbstractVector{<:Float64},
+              geom::AbstractMatrix{<:Float64})
     eri = 0.0
-
     for ib in 1:ngauss
         for jb in 1:ngauss
             aij = 1.0 / (xpnt[ib] + xpnt[jb])
@@ -37,7 +70,7 @@ function ssss(i::Int32, j::Int32, k::Int32, l::Int32, ngauss::Int32,
                        (geom[2, i] - geom[2, j])^2 +
                        (geom[3, i] - geom[3, j])^2)) * (aij^1.5)
 
-            if abs(dij) > parameters.dtol
+            if abs(dij) > dtol
                 xij = aij * (xpnt[ib] * geom[1, i] + xpnt[jb] * geom[1, j])
                 yij = aij * (xpnt[ib] * geom[2, i] + xpnt[jb] * geom[2, j])
                 zij = aij * (xpnt[ib] * geom[3, i] + xpnt[jb] * geom[3, j])
@@ -51,7 +84,7 @@ function ssss(i::Int32, j::Int32, k::Int32, l::Int32, ngauss::Int32,
                                    (geom[2, k] - geom[2, l])^2 +
                                    (geom[3, k] - geom[3, l])^2)) * (akl^1.5)
 
-                        if abs(dkl) > parameters.dtol
+                        if abs(dkl) > dtol
                             aijkl = (xpnt[ib] + xpnt[jb]) *
                                     (xpnt[kb] + xpnt[lb]) /
                                     (xpnt[ib] + xpnt[jb] + xpnt[kb] + xpnt[lb])
@@ -69,8 +102,8 @@ function ssss(i::Int32, j::Int32, k::Int32, l::Int32, ngauss::Int32,
                                    (xpnt[kb] * geom[3, k] +
                                     xpnt[lb] * geom[3, l]))^2)
 
-                            f0t = parameters.sqrpi2
-                            if tt > parameters.rcut
+                            f0t = sqrpi2
+                            if tt > rcut
                                 f0t = (tt^(-0.5)) *
                                       SpecialFunctions.erf(sqrt(tt))
                             end #if
@@ -81,4 +114,5 @@ function ssss(i::Int32, j::Int32, k::Int32, l::Int32, ngauss::Int32,
             end #if
         end
     end
+    return eri
 end #ssss
