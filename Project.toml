@@ -1,0 +1,8 @@
+name = "BasicHFProxy"
+uuid = "22e46d4d-44a4-4fb3-9bf8-c2d07dd11e16"
+authors = ["William F Godoy <williamfgc@yahoo.com>"]
+version = "0.1.0"
+
+[deps]
+MPI = "da04e1cc-30fd-572f-bb4f-1f8673147195"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
