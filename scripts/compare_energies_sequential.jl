@@ -1,6 +1,6 @@
 using BasicHFProxy
 
-for s in (:he4, :he8, :he16, :he32, :he64)
+for s in (:he4, :he8, :he16, :he32, :he64, :he128, :he256)
     f = BasicHFProxy.DATA[s]
     E = bhfp_sequential(f)
     E_expected = BasicHFProxy.expected_energy(f)
