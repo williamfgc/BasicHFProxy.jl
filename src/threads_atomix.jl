@@ -44,7 +44,7 @@ function bhfp_threads_atomix(inputfile = get_input_filename_from_args();
         end
     end
 
-    _kernel_threaded_atomix(nn, schwarz, ngauss, xpnt, coef, geom, fock, dens)
+    _kernel_threaded_atomix!(fock, nn, schwarz, ngauss, xpnt, coef, geom, dens)
 
     # trace Fock with the density, print the 2e- energy
     erep = 0.0
@@ -58,8 +58,8 @@ function bhfp_threads_atomix(inputfile = get_input_filename_from_args();
     return E
 end
 
-function _kernel_threaded_atomix(nn, schwarz, ngauss, xpnt, coef, geom, fock,
-                                 dens)
+function _kernel_threaded_atomix!(fock, nn, schwarz, ngauss, xpnt, coef, geom,
+                                  dens)
     # The following loop (expanded to four indices, with permutational
     # symmetry) represents the kernel of Hartree-Fock calculations.
     # Integrals are screened to avoid small terms.
@@ -163,4 +163,5 @@ function _kernel_threaded_atomix(nn, schwarz, ngauss, xpnt, coef, geom, fock,
             Atomix.@atomic fock[j, l] -= dens[i, k] * eri
         end
     end
+    # display(fock)
 end
