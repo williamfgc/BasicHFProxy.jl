@@ -1,12 +1,12 @@
 using Test
 using BasicHFProxy
 
-const h4 = joinpath(dirname(pathof(BasicHFProxy)), "../data/he4")
-const h32 = joinpath(dirname(pathof(BasicHFProxy)), "../data/he32")
+const he4 = joinpath(dirname(pathof(BasicHFProxy)), "../data/he4")
+const he32 = joinpath(dirname(pathof(BasicHFProxy)), "../data/he32")
 
 @testset "Input file parsing" begin
-    @testset "h4" begin
-        input = BasicHFProxy.parse_input_file(h4)
+    @testset "he4" begin
+        input = BasicHFProxy.parse_input_file(he4)
         @test typeof(input) ==
               NamedTuple{(:ngauss, :natom, :xpnt, :coef, :geom),
                          Tuple{Int64, Int64, Vector{Float64}, Vector{Float64},
@@ -20,8 +20,8 @@ const h32 = joinpath(dirname(pathof(BasicHFProxy)), "../data/he32")
                              0.1 1.0 0.0
                              1.0 0.2 0.0]'
     end
-    @testset "h32" begin
-        input = BasicHFProxy.parse_input_file(h32)
+    @testset "he32" begin
+        input = BasicHFProxy.parse_input_file(he32)
         @test typeof(input) ==
               NamedTuple{(:ngauss, :natom, :xpnt, :coef, :geom),
                          Tuple{Int64, Int64, Vector{Float64}, Vector{Float64},
@@ -67,6 +67,6 @@ const h32 = joinpath(dirname(pathof(BasicHFProxy)), "../data/he32")
 end
 
 @testset "Sequential" begin
-    @test bhfp_sequential(h4) isa Float64
-    @test bhfp_sequential(h4) ≈ 4.050176411152184
+    @test bhfp_sequential(he4) isa Float64
+    @test bhfp_sequential(he4) ≈ 4.050176411152184
 end
