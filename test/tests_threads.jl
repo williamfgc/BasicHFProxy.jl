@@ -3,12 +3,17 @@ if Threads.nthreads == 1
 end
 
 @testset "Threads" begin
-# considering all input files would take too long
-for s in (:he4, :he8)
-    f = BasicHFProxy.DATA[s]
-    @testset "$s" begin
-        @test bhfp_threads(f) isa Float64
-        @test bhfp_threads(f) ≈ bhfp_sequential(f)
-        @test bhfp_threads(f) ≈ BasicHFProxy.expected_energy(f)
+    for bhfp in (bhfp_threads_lock, bhfp_threads_atomix)
+        @testset "$bhfp" begin
+            # considering all input files would take too long
+            for s in (:he4, :he8)
+                f = BasicHFProxy.DATA[s]
+                @testset "$s" begin
+                    @test bhfp(f) isa Float64
+                    @test bhfp(f) ≈ bhfp_sequential(f)
+                    @test bhfp(f) ≈ BasicHFProxy.expected_energy(f)
+                end
+            end
+        end
     end
-end end
+end

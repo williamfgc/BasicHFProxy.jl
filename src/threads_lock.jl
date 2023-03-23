@@ -1,5 +1,5 @@
-function bhfp_threads(inputfile = get_input_filename_from_args();
-                      verbose = false)
+function bhfp_threads_lock(inputfile = get_input_filename_from_args();
+                           verbose = false)
     (; ngauss, natom, xpnt, coef, geom) = parse_input_file(inputfile)
 
     dens = Matrix{Float64}(undef, natom, natom)
@@ -44,7 +44,7 @@ function bhfp_threads(inputfile = get_input_filename_from_args();
         end
     end
 
-    _threaded_kernel_lock(nn, schwarz, ngauss, xpnt, coef, geom, fock, dens)
+    _kernel_threaded_lock(nn, schwarz, ngauss, xpnt, coef, geom, fock, dens)
 
     # trace Fock with the density, print the 2e- energy
     erep = 0.0
@@ -58,7 +58,7 @@ function bhfp_threads(inputfile = get_input_filename_from_args();
     return E
 end
 
-function _threaded_kernel_lock(nn, schwarz, ngauss, xpnt, coef, geom, fock,
+function _kernel_threaded_lock(nn, schwarz, ngauss, xpnt, coef, geom, fock,
                                dens)
     # The following loop (expanded to four indices, with permutational
     # symmetry) represents the kernel of Hartree-Fock calculations.

@@ -1,6 +1,7 @@
 module BasicHFProxy
 
 import SpecialFunctions # erf
+import Atomix
 
 function datafilter(fname)
     contains(fname, '_') && return false
@@ -14,8 +15,9 @@ const DATA = Dict(Symbol(f) => joinpath(DATADIR, f)
 
 include("common.jl")
 include("sequential.jl")
-include("threads.jl")
+include("threads_lock.jl")
+include("threads_atomix.jl")
 
-export bhfp_sequential, bhfp_threads
+export bhfp_sequential, bhfp_threads_lock, bhfp_threads_atomix
 
 end
