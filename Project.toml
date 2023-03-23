@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 Atomix = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
+FLoops = "cc61a311-1640-44b5-9fba-1b764f453329"
 MPI = "da04e1cc-30fd-572f-bb4f-1f8673147195"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
