@@ -59,7 +59,7 @@ function _kernel_threaded_floops(nn, schwarz, ngauss, natom, xpnt, coef, geom,
     # Integrals are screened to avoid small terms.
     nnnn = ((nn^2) + nn) ÷ 2
 
-    FLoops.@floop for ijkl in 1:nnnn
+    FLoops.@floop FLoops.SequentialEx() for ijkl in 1:nnnn
         FLoops.@init Δ = zeros(natom, natom)
         fill!(Δ, 0)
         # decompose triangular ijkl index into ij>=kl
