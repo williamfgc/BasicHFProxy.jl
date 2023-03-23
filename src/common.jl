@@ -53,6 +53,15 @@ function parse_input_file(filename)
     return (; ngauss, natom, xpnt, coef, geom)
 end
 
+"""
+Extracts the expected energy from the given input file.
+"""
+function expected_energy(filename)
+    energy_line = only(filter(contains("2e- energy="), readlines(filename)))
+    energy_str = strip(replace(energy_line, "2e- energy=" => ""))
+    return parse(Float64, energy_str)
+end
+
 # computation
 """
 Main kernel for the calculation of the two-electron integrals
