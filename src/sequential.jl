@@ -1,4 +1,4 @@
-function bhfp_sequential(inputfile = get_input_filename_from_args())
+function bhfp_sequential(inputfile = get_input_filename_from_args(); verbose=false)
     (; ngauss, natom, xpnt, coef, geom) = parse_input_file(inputfile)
 
     dens = Matrix{Float64}(undef, natom, natom)
@@ -87,6 +87,6 @@ function bhfp_sequential(inputfile = get_input_filename_from_args())
         end
     end
     E = erep * 0.5
-    println("2e- energy= ", E)
+    verbose && println("2e- energy= ", E)
     return E
 end
