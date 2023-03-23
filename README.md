@@ -21,8 +21,8 @@ KeySet for a Dict{Symbol, String} with 9 entries. Keys:
 
 julia> he4 = BasicHFProxy.DATA[:he4];
 
-julia> E = bhfp_sequential(he4);
-2e- energy= 4.050176411152184
+julia> E = bhfp_sequential(he4)
+4.050176411152184
 
 julia> BasicHFProxy.expected_energy(he4) # parsed from data file
 4.0501763971342815
