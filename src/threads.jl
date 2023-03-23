@@ -44,14 +44,29 @@ function bhfp_threads(inputfile = get_input_filename_from_args();
         end
     end
 
+    _threaded_kernel_lock(nn, schwarz, ngauss, xpnt, coef, geom, fock, dens)
+
+    # trace Fock with the density, print the 2e- energy
+    erep = 0.0
+    for i in 1:natom
+        for j in 1:natom
+            erep = erep + fock[i, j] * dens[i, j]
+        end
+    end
+    E = erep * 0.5
+    verbose && println("2e- energy= ", E)
+    return E
+end
+
+function _threaded_kernel_lock(nn, schwarz, ngauss, xpnt, coef, geom, fock,
+                               dens)
     # The following loop (expanded to four indices, with permutational
     # symmetry) represents the kernel of Hartree-Fock calculations.
     # Integrals are screened to avoid small terms.
     nnnn = ((nn^2) + nn) ÷ 2
 
-    #!$OMP PARALLEL DO PRIVATE(ib,jb,kb,lb,ijkl,ij,i,j,kl,k,l,n,aij,dij,xij,yij,zij,akl,dkl,aijkl,tt,f0t,eri)
-
-    for ijkl in 1:nnnn
+    lck = ReentrantLock()
+    Threads.@threads :static for ijkl in 1:nnnn
         # decompose triangular ijkl index into ij>=kl
         ij = isqrt(2 * ijkl)
         n = (ij * ij + ij) ÷ 2
@@ -141,30 +156,17 @@ function bhfp_threads(inputfile = get_input_filename_from_args();
             if (i == k && j == l)
                 eri = eri * 0.5
             end
-            #!$OMP ATOMIC
-            fock[i, j] = fock[i, j] + dens[k, l] * eri * 4.0
-            #!$OMP ATOMIC
-            fock[k, l] = fock[k, l] + dens[i, j] * eri * 4.0
-            #!$OMP ATOMIC
-            fock[i, k] = fock[i, k] - dens[j, l] * eri
-            #!$OMP ATOMIC
-            fock[i, l] = fock[i, l] - dens[j, k] * eri
-            #!$OMP ATOMIC
-            fock[j, k] = fock[j, k] - dens[i, l] * eri
-            #!$OMP ATOMIC
-            fock[j, l] = fock[j, l] - dens[i, k] * eri
+            lock(lck)
+            try
+                fock[i, j] = fock[i, j] + dens[k, l] * eri * 4.0
+                fock[k, l] = fock[k, l] + dens[i, j] * eri * 4.0
+                fock[i, k] = fock[i, k] - dens[j, l] * eri
+                fock[i, l] = fock[i, l] - dens[j, k] * eri
+                fock[j, k] = fock[j, k] - dens[i, l] * eri
+                fock[j, l] = fock[j, l] - dens[i, k] * eri
+            finally
+                unlock(lck)
+            end
         end
     end
-    #!$OMP END PARALLEL DO
-
-    # trace Fock with the density, print the 2e- energy
-    erep = 0.0
-    for i in 1:natom
-        for j in 1:natom
-            erep = erep + fock[i, j] * dens[i, j]
-        end
-    end
-    E = erep * 0.5
-    verbose && println("2e- energy= ", E)
-    return E
 end
