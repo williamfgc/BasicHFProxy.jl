@@ -14,7 +14,8 @@ const DATA = Dict(Symbol(f) => joinpath(DATADIR, f)
 
 include("common.jl")
 include("sequential.jl")
+include("threads.jl")
 
-export bhfp_sequential
+export bhfp_sequential, bhfp_threads
 
 end
