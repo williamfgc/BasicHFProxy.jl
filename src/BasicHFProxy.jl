@@ -2,6 +2,7 @@ module BasicHFProxy
 
 import SpecialFunctions # erf
 import Atomix
+import MPI
 
 function datafilter(fname)
     contains(fname, '_') && return false
@@ -17,7 +18,11 @@ include("common.jl")
 include("sequential.jl")
 include("threads_lock.jl")
 include("threads_atomix.jl")
+include("mpi.jl")
 
-export bhfp_sequential, bhfp_threads_lock, bhfp_threads_atomix
+export bhfp_sequential,
+       bhfp_threads_lock,
+       bhfp_threads_atomix,
+       bhfp_mpi
 
 end
