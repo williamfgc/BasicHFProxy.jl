@@ -7,18 +7,17 @@ const tobohrs = 1.889725987722
 
 # input file
 function get_input_filename_from_args(args = ARGS)
+    ids = collect(keys(BasicHFProxy.DATA))
     if length(args) != 1
-        if @isdefined MPI
-            throw(ArgumentError("Usage: mpirun -n <nprocs> julia --project BasicHFProxy_<backend> <KEY>"))
-        else
-            throw(ArgumentError("Usage: julia --project BasicHFProxy_<backend> <KEY>"))
-        end
+        throw(ArgumentError("Please provide an identifier in `ARGS` or an explicit input file." *
+                            " Supported identifiers: $(join(ids, ", "))"))
     end
-    key = Symbol(only(args))
-    if haskey(BasicHFProxy.DATA, key)
-        return BasicHFProxy.DATA[key]
+    id = Symbol(only(args))
+    if haskey(BasicHFProxy.DATA, id)
+        return BasicHFProxy.DATA[id]
     else
-        throw(ArgumentError("Unknown key \"$key\". Supported keys: $(collect(keys(BasicHFProxy.DATA)))"))
+        throw(ArgumentError("Unknown input identifier \"$id\"." *
+                            " Supported identifiers: $(collect(keys(BasicHFProxy.DATA)))"))
     end
 end
 
