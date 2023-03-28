@@ -1,0 +1,35 @@
+Input: he4
+number of ranks: 6
+E = 4.050176411152184
+Time: 0.48007sec
+
+Input: he8
+number of ranks: 6
+E = 11.585212610450458
+Time: 0.36035sec
+
+Input: he16
+number of ranks: 6
+E = 36.90238804217135
+Time: 0.29857sec
+
+Input: he32
+number of ranks: 6
+E = 122.24809252263482
+Time: 0.35005sec
+
+Input: he64
+number of ranks: 6
+E = 419.6706158097441
+Time: 0.97959sec
+
+Input: he128
+number of ranks: 6
+E = 1300.0865025179178
+Time: 3.32301sec
+
+Input: he256
+number of ranks: 6
+E = 4204.772235830358
+Time: 18.19465sec
+
