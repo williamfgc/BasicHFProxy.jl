@@ -12,6 +12,6 @@ const MPI_NPROCS = clamp(Sys.CPU_THREADS, 2, 5)
 
 # include all tests_*.jl files from the test/ directory
 for f in filter(startswith("tests_"), readdir(@__DIR__))
-    !contains(f, "mpi") && continue
+    # !contains(f, "mpi") && continue
     include(f)
 end
