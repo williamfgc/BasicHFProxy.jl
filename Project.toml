@@ -5,7 +5,10 @@ version = "0.1.0"
 
 [deps]
 Atomix = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
+JACC = "0979c8fe-16a4-4796-9b82-89a9f10403ea"
 MPI = "da04e1cc-30fd-572f-bb4f-1f8673147195"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+Preferences = "21216c6a-2e73-6563-6e65-726566657250"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [compat]

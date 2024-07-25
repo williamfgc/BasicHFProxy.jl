@@ -18,11 +18,14 @@ include("common.jl")
 include("sequential.jl")
 include("threads_lock.jl")
 include("threads_atomix.jl")
+include("BasicHFPreferences.jl")
+include("jacc.jl")
 include("mpi.jl")
 
 export bhfp_sequential,
        bhfp_threads_lock,
        bhfp_threads_atomix,
-       bhfp_mpi
+       bhfp_mpi,
+       bhfp_jacc
 
 end
